@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ faculty }} Analysis | Work Hours Analyzer</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_base.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }
+        .summary-card {
+            border-radius: 16px;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+        }
+        .progress-bar {
+            background: #ffeaea;
+            border-radius: 100px;
+            height: 12px;
+            width: 100%;
+        }
+        .progress-bar-inner {
+            background: #991b1b;
+            border-radius: 100px;
+            height: 100%;
+        }
+        .badge-status {
+            font-size: 1em;
+        }
+        .main-analysis-card {
+            border-radius: 18px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+            background: #fff;
+            padding:2.5em;
+            margin-top: 3em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+      <div class="main-analysis-card">
+        <div class="d-flex align-items-center mb-4">
+            <h2 class="mb-0" >{{ faculty }} Attendance Analysis</h2>
+        </div>
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <div class="card summary-card border-0 mb-3">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fa fa-clock me-1"></i> Average Hours Worked</h5>
+                <p class="card-text fs-4">{{ avg_hours }}</p>
+                <div class="progress-bar mt-3">
+                    <div class="progress-bar-inner" style="width: {{ (avg_hours / 8.0 * 100) | round(0) }}%"></div>
+                </div>
+                <small class="text-muted">Relative to 8 hours/day</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card summary-card border-0 mb-3">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fa fa-triangle-exclamation text-danger me-1"></i> Unusual Days</h5>
+                <p class="card-text fs-4 text-danger">{{ anomaly_count }}</p>
+                <small class="text-muted">Flagged as unusual</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card summary-card border-0 mb-3">
+              <div class="card-body">
+                <h5 class="card-title"><i class="fa fa-database text-success me-1"></i> Total Records</h5>
+                <p class="card-text fs-4">{{ total_records }}</p>
+                <small class="text-muted">Attendance entries</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+        <table id="attendanceTable" class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time In</th>
+              <th>Time Out</th>
+              <th>Hours Worked</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in records.itertuples() %}
+            <tr>
+                <td>{{ row.date.date() }}</td>
+                <td>{{ row.time_in }}</td>
+                <td>{{ row.time_out }}</td>
+                <td>{{ "%.2f"|format(row.work_hours) }}</td>
+                <td>
+                {% if row.anomaly == "Unusual" %}
+                    <span class="badge rounded-pill px-3 py-2" style="background:#ffeaea; color:#991b1b; font-weight:600;">
+                    <i class="fa fa-exclamation-triangle me-1"></i> Unusual
+                    </span>
+                {% else %}
+                    <span class="badge rounded-pill px-3 py-2" style="background:#e5f6ea; color:#18804c; font-weight:600;">
+                    <i class="fa fa-check-circle me-1"></i> Normal
+                    </span>
+                {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+        <a href="{{ url_for('faculty_list') }}" class="btn btn-outline-dark mt-4">
+            <i class="fa fa-arrow-left me-1"></i> Back to Faculty List
+        </a>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#attendanceTable').DataTable({ "order": [[0, "desc"]] });
+        });
+    </script>
+</body>
+</html>

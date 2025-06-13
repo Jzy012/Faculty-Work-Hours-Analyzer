@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Faculty List | Work Hours Analyzer</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_base.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }
+        .faculty-card {
+            border-radius: 18px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 2.5em;
+            background: #fff;
+            margin-top:2em;
+        }
+        .table thead { background: #f5f7fa; }
+        .btn-main {
+            background: #991b1b; color: #fff; border: none;
+        }
+        .btn-main:hover, .btn-main:focus {
+            background: #b91c1c; color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+      <div class="faculty-card">
+        <h2 class="mb-4" ></i>Faculty Members</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, msg in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <table id="facultyTable" class="table table-hover">
+          <thead>
+            <tr>
+              <th><i class="fa fa-user me-1"></i>Name</th>
+              <th><i class="fa fa-chart-line me-1"></i>Analyze</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for name in faculty_names %}
+            <tr>
+                <td class="fw-semibold">{{ name }}</td>
+                <td>
+                    <a href="{{ url_for('analysis', faculty_name=name) }}" class="btn btn-main btn-sm">
+                        <i class="fa fa-chart-line me-1"></i> View Analysis
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-dark mt-4">
+            <i class="fa fa-arrow-left me-1"></i> Upload Another File
+        </a>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#facultyTable').DataTable();
+        });
+    </script>
+</body>
+</html>
